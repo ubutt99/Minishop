@@ -1,21 +1,21 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
 trigger:
 - main
 
 pool:
   vmImage: ubuntu-latest
 
-steps: 
+steps:
+- checkout: self
+
+- task: InstallSSHKey@0
+  displayName: "Install EC2 SSH Private Key"
+  inputs:
+    knownHostsEntry: '$(ec2-host)'
+    sshKeySecureFile: 'ec2-privatekey'
+
 - script: |
-    echo "Hello, This is my first pipeline on azure"
-    echo "I'm learning about the pipelines"
-    whoami
-    pwd
-    echo "My application is minishop"
-    echo "this is triggered by github push"
-  displayName: "My first linux pipeline"
-#
+    ssh -o StrictHostKeyChecking=no $(ec2-user)@$(ec2-host) '
+      cd /home/ubuntu/Minishop/ &&
+      git pull origin main
+    '
+  displayName: "Pull latest code on EC2"
