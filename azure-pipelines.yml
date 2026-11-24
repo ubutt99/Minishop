@@ -11,20 +11,35 @@ steps:
 - script: |
     set -e
 
-    # Create temporary SSH private key
-    echo "$EC2_PRIVATE_KEY" > /tmp/ec2-key.pem
+    echo "Preparing SSH private key..."
+
+    printf '%s\n' "$EC2_PRIVATE_KEY" | tr -d '\r' > /tmp/ec2-key.pem
     chmod 600 /tmp/ec2-key.pem
 
-    # Connect to EC2 and deploy
+    echo "Connecting to EC2..."
+
     ssh -i /tmp/ec2-key.pem \
       -o StrictHostKeyChecking=no \
+      -o BatchMode=yes \
       $(ec2-user)@$(ec2-host) '
-        cd /home/ubuntu/Minishop/ &&
-        git pull origin main &&
+        set -e
+
+        echo "Connected to EC2"
+
+        cd /home/ubuntu/Minishop/
+
+        echo "Pulling latest code from GitHub..."
+        git pull origin main
+
+        echo "Restarting Nginx..."
         sudo systemctl restart nginx
+
+        echo "Checking Nginx status..."
+        sudo systemctl is-active nginx
+
+        echo "Deployment completed successfully!"
       '
 
-    # Remove temporary private key
     rm -f /tmp/ec2-key.pem
 
   displayName: "Deploy MiniShop to EC2"
