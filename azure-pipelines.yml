@@ -1,3 +1,4 @@
+
 trigger:
 - main
 
@@ -7,15 +8,25 @@ pool:
 steps:
 - checkout: self
 
-- task: InstallSSHKey@0
-  displayName: "Install EC2 SSH Private Key"
-  inputs:
-    knownHostsEntry: '$(ec2-host)'
-    sshKeySecureFile: 'ec2-privatekey'
-
 - script: |
-    ssh -o StrictHostKeyChecking=no $(ec2-user)@$(ec2-host) '
-      cd /home/ubuntu/Minishop/ &&
-      git pull origin main
-    '
-  displayName: "Pull latest code on EC2"
+    set -e
+
+    # Create temporary SSH private key
+    echo "$EC2_PRIVATE_KEY" > /tmp/ec2-key.pem
+    chmod 600 /tmp/ec2-key.pem
+
+    # Connect to EC2 and deploy
+    ssh -i /tmp/ec2-key.pem \
+      -o StrictHostKeyChecking=no \
+      $(ec2-user)@$(ec2-host) '
+        cd /home/ubuntu/Minishop/ &&
+        git pull origin main &&
+        sudo systemctl restart nginx
+      '
+
+    # Remove temporary private key
+    rm -f /tmp/ec2-key.pem
+
+  displayName: "Deploy MiniShop to EC2"
+  env:
+    EC2_PRIVATE_KEY: $(ec2-privatekey)
