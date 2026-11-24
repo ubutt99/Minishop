@@ -9,11 +9,10 @@ trigger:
 pool:
   vmImage: ubuntu-latest
 
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
-
+steps: 
 - script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+    echo "Hello, This is my first pipeline on azure"
+    echo "I'm learning about the pipelines"
+    whoami
+    pwd
+  displayName: "My first linux pipeline"
