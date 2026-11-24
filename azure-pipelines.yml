@@ -17,3 +17,4 @@ steps:
     pwd
     echo "My application is minishop"
   displayName: "My first linux pipeline"
+#
