@@ -15,4 +15,5 @@ steps:
     echo "I'm learning about the pipelines"
     whoami
     pwd
+    echo "My application is minishop"
   displayName: "My first linux pipeline"
