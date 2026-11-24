@@ -16,5 +16,6 @@ steps:
     whoami
     pwd
     echo "My application is minishop"
+    echo "this is triggered by github push"
   displayName: "My first linux pipeline"
 #
